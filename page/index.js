@@ -10,7 +10,7 @@ keyboard = [
     Key(Coords(1, 0), KeyFunc("2",   Functions.TWO),      KeyFunc("10^x",  Functions.TEN_TO_X),   null), 
     Key(Coords(2, 0), KeyFunc("3",   Functions.THREE),    KeyFunc("e^x",   Functions.E_TO_X),     null), 
     Key(Coords(0, 1), KeyFunc("4",   Functions.FOUR),     KeyFunc("log x", Functions.LOG_X_OF_Y), null), 
-    Key(Coords(1, 1), KeyFunc("5",   Functions.FIVE),     KeyFunc("log10", Functions.LOG),        null), 
+    Key(Coords(1, 1), KeyFunc("5",   Functions.FIVE),     KeyFunc("log", Functions.LOG),        null), 
     Key(Coords(2, 1), KeyFunc("6",   Functions.SIX),      KeyFunc("ln",    Functions.LN),         null), 
     Key(Coords(0, 2), KeyFunc("7",   Functions.SEVEN),    KeyFunc("1/x",   Functions.INV),        null), 
     Key(Coords(1, 2), KeyFunc("8",   Functions.EIGHT),    KeyFunc("log2",  Functions.LOG2),       null), 
@@ -217,11 +217,33 @@ function formatFixed(x) {
 }
 
 function formatScientific(x) {
-	return x.toExponential(decimalPlaces)
+
+	if (x == 0) {
+		a = 1
+		x_sci = 0
+		log10_sci = 0
+		unit = ' '
+	} else {
+		a = x/Math.abs(x)
+
+		log10_sci = Math.floor(Math.log10(x))
+
+        unit = "e" + (log10_sci<0?"-":"+") + (Math.abs(log10_sci)<10?"0":"") + Math.abs(log10_sci)
+		
+		x_sci = x/Math.pow(10, log10_sci)
+	}
+
+	formatted = (a*x_sci).toFixed(decimalPlaces) + " " + unit
+	return formatted
 }
 
 function formatEngineering(x) {
 	units = {
+        '-30'   : 'q',
+        '-27'   : 'r',
+        '-24'   : 'y',
+        '-21'   : 'z',
+        '-18'   : 'a',
 		'-15'	: 'f',
 		 '-12'	: 'p',
 		 '-9'	: 'n',
@@ -232,7 +254,12 @@ function formatEngineering(x) {
 		 '6'	: 'M',
 		 '9'	: 'G',
 		 '12'	: 'T',
-		 '15'	: 'P'}
+		 '15'	: 'P',
+         '18'   : 'E',
+         '21'   : 'Z',
+         '24'   : 'Y',
+         '27'   : 'R',
+         '30'   : 'Q'}
 
 	if (x == 0) {
 		a = 1
@@ -244,7 +271,7 @@ function formatEngineering(x) {
 
 		log10_eng = Math.floor(Math.log10(x)/3)*3
 
-		if (Math.abs(log10_eng) <= 15)
+		if (Math.abs(log10_eng) <= 30)
 			unit = units[log10_eng]
 		else
 			unit = "e" + log10_eng
@@ -278,15 +305,15 @@ function update_display() {
         x_reg.setProperty(hmUI.prop.ALIGN_H, hmUI.align.RIGHT)
 		x_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekX()));
 		y_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekY()));
-		z_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekZ()));
-		t_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekT()));
+		//z_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekZ()));
+		//t_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekT()));
 	} else {
         console.log(`Y: ${stack.peekY()} X: ${stack.peekX()} input_buffer: ${input_buffer}`)
         x_reg.setProperty(hmUI.prop.ALIGN_H, hmUI.align.LEFT)
     	x_reg.setProperty(hmUI.prop.TEXT, input_buffer);
 		y_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekX()));
-		z_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekY()));
-		t_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekZ()));
+		//z_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekY()));
+		//t_reg.setProperty(hmUI.prop.TEXT, formatFunction(stack.peekZ()));
 	}
 	console.log('')
 }
@@ -295,33 +322,37 @@ function update_display() {
 Page({
     build() {
 		
-        dummy_reg = hmUI.createWidget(hmUI.widget.TEXT, {
-            x: 365,
-            y: 0,
-            w: 100,
-			h: 100,
-            text: "-pnumkMGPT0123456789.eNa ",
-            color: 0xffffff,
-            align_h: hmUI.align.RIGHT,
-			font: "UbuntuMono-Regular.ttf",
-			text_style: hmUI.text_style.WRAP
-        });
+        chars =  "-pnumkMGPT0123456789.eNa "
+        Array.from(chars).forEach(c => {
+            hmUI.createWidget(hmUI.widget.TEXT, {
+                x: 400,
+                y: 0,
+                w: 20,
+                h: 100,
+                color: 0xffffff,
+                text: c,
+                align_h: hmUI.align.RIGHT,
+                font: "UbuntuMono-Regular.ttf",
+                text_style: hmUI.text_style.WRAP,
+                text_size: 40
+            });
+        })
 
-        t_reg = hmUI.createWidget(hmUI.widget.TEXT, {
-			...Styles.TEXT_STYLE,
-            y: 35,
-        });
-        z_reg = hmUI.createWidget(hmUI.widget.TEXT, {
-			...Styles.TEXT_STYLE,
-            y: 55,
-        });
+        //t_reg = hmUI.createWidget(hmUI.widget.TEXT, {
+		//	...Styles.TEXT_STYLE,
+        //    y: 35,
+        //});
+        //z_reg = hmUI.createWidget(hmUI.widget.TEXT, {
+		//	...Styles.TEXT_STYLE,
+        //    y: 55,
+        //});
         y_reg = hmUI.createWidget(hmUI.widget.TEXT, {
 			...Styles.TEXT_STYLE,
-            y: 75,
+            y: 45,
         });
         x_reg = hmUI.createWidget(hmUI.widget.TEXT, {
 			...Styles.TEXT_STYLE,
-            y: 95,
+            y: 75,
         });
 
         console.log(keyboard[0].coords.x)
@@ -337,15 +368,14 @@ Page({
                     normal_color: 0x707070,
                     press_color: 0xc0c0c0,
                     radius: 10,
-                    click_func: press_key.bind(null, keyboard[idx].funcs[0].func)
+                    click_func: press_key.bind(null, keyboard[idx].funcs[0].func),
+                    text_size: 30
                 })
             )
         }
 
-		stack.push(8e18)
-		stack.push(8e18)
-		stack.push(8e18)
-		stack.push(8e18)
+		stack.push(8e10)
+		stack.push(8e10)
 
 		update_display()
 

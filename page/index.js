@@ -6,24 +6,24 @@ import Functions from './Functions.js'
 import Stack from './stack.js'
 
 keyboard = [ 
-    Key(Coords(0, 0), KeyFunc("1",   Functions.ONE),      KeyFunc("y^x",   Functions.Y_TO_X),     null), 
-    Key(Coords(1, 0), KeyFunc("2",   Functions.TWO),      KeyFunc("10^x",  Functions.TEN_TO_X),   null), 
-    Key(Coords(2, 0), KeyFunc("3",   Functions.THREE),    KeyFunc("e^x",   Functions.E_TO_X),     null), 
-    Key(Coords(0, 1), KeyFunc("4",   Functions.FOUR),     KeyFunc("log x", Functions.LOG_X_OF_Y), null), 
-    Key(Coords(1, 1), KeyFunc("5",   Functions.FIVE),     KeyFunc("log", Functions.LOG),        null), 
-    Key(Coords(2, 1), KeyFunc("6",   Functions.SIX),      KeyFunc("ln",    Functions.LN),         null), 
-    Key(Coords(0, 2), KeyFunc("7",   Functions.SEVEN),    KeyFunc("1/x",   Functions.INV),        null), 
-    Key(Coords(1, 2), KeyFunc("8",   Functions.EIGHT),    KeyFunc("log2",  Functions.LOG2),       null), 
-    Key(Coords(2, 2), KeyFunc("9",   Functions.NINE),     KeyFunc("mod",   Functions.MOD),        null), 
-    Key(Coords(1, 3), KeyFunc("0",   Functions.ZERO),     KeyFunc('FIX',   Functions.FIX),        null), 
-    Key(Coords(2, 3), KeyFunc(".",   Functions.DOT),      KeyFunc('SCI',   Functions.SCI),        null), 
-    Key(Coords(3, 3), KeyFunc("+",   Functions.PLUS),     KeyFunc("ENG",   Functions.ENG),        null), 
-    Key(Coords(3, 2), KeyFunc("-",   Functions.MINUS),    KeyFunc("EE",    Functions.EE),         null), 
-    Key(Coords(3, 1), KeyFunc("*",   Functions.TIMES),    KeyFunc("√x",    Functions.SQRT),       null), 
-    Key(Coords(3, 0), KeyFunc("/",   Functions.DIVIDE),   KeyFunc('x²',    Functions.SQUARE),     null), 
-    Key(Coords(4, 2), KeyFunc("=",   Functions.ENTER),    KeyFunc("v",     Functions.STACK_POP),  null), 
-    Key(Coords(4, 0), KeyFunc("+/-", Functions.NEGATIVE), KeyFunc('<->',   Functions.STACK_SWAP), null), 
-    Key(Coords(4, 1), KeyFunc("fn",  Functions.FUNCTION), KeyFunc("fn",    Functions.NORMAL),     null), 
+    Key(Coords(0, 0), KeyFunc("1",   Functions.ONE),      KeyFunc("y^x",   Functions.Y_TO_X),     KeyFunc("sin", Functions.SIN)),
+    Key(Coords(1, 0), KeyFunc("2",   Functions.TWO),      KeyFunc("10^x",  Functions.TEN_TO_X),   KeyFunc("cos", Functions.COS)),
+    Key(Coords(2, 0), KeyFunc("3",   Functions.THREE),    KeyFunc("e^x",   Functions.E_TO_X),     KeyFunc("tan", Functions.TAN)),
+    Key(Coords(0, 1), KeyFunc("4",   Functions.FOUR),     KeyFunc("log x", Functions.LOG_X_OF_Y), KeyFunc("asin", Functions.ASIN)),
+    Key(Coords(1, 1), KeyFunc("5",   Functions.FIVE),     KeyFunc("log",   Functions.LOG),        KeyFunc("acos", Functions.ACOS)),
+    Key(Coords(2, 1), KeyFunc("6",   Functions.SIX),      KeyFunc("ln",    Functions.LN),         KeyFunc("atan", Functions.ATAN)),
+    Key(Coords(0, 2), KeyFunc("7",   Functions.SEVEN),    KeyFunc("1/x",   Functions.INV),        null),
+    Key(Coords(1, 2), KeyFunc("8",   Functions.EIGHT),    KeyFunc("log2",  Functions.LOG2),       null),
+    Key(Coords(2, 2), KeyFunc("9",   Functions.NINE),     KeyFunc("mod",   Functions.MOD),        null),
+    Key(Coords(1, 3), KeyFunc("0",   Functions.ZERO),     KeyFunc('FIX',   Functions.FIX),        null),
+    Key(Coords(2, 3), KeyFunc(".",   Functions.DOT),      KeyFunc('SCI',   Functions.SCI),        null),
+    Key(Coords(3, 3), KeyFunc("+",   Functions.PLUS),     KeyFunc("ENG",   Functions.ENG),        null),
+    Key(Coords(3, 2), KeyFunc("-",   Functions.MINUS),    KeyFunc("EE",    Functions.EE),         null),
+    Key(Coords(3, 1), KeyFunc("*",   Functions.TIMES),    KeyFunc("√x",    Functions.SQRT),       null),
+    Key(Coords(3, 0), KeyFunc("/",   Functions.DIVIDE),   KeyFunc('x²',    Functions.SQUARE),     null),
+    Key(Coords(4, 2), KeyFunc("=",   Functions.ENTER),    KeyFunc("v",     Functions.STACK_POP),  null),
+    Key(Coords(4, 0), KeyFunc("+/-", Functions.NEGATIVE), KeyFunc('<->',   Functions.STACK_SWAP), KeyFunc("TAU", Functions.TAU)),
+    Key(Coords(4, 1), KeyFunc("fn",  Functions.FUNCTION), KeyFunc("fn",    Functions.FUNCTION2),  KeyFunc("fn", Functions.NORMAL)),
 ]
 
 function Key(coords, keyFuncA, keyFuncB, keyFuncC) {
@@ -37,8 +37,7 @@ function Coords(x, y) {
 function KeyFunc(text, func) {
 	return {text:text, func:func}
 }
-	
-    
+
 displayMode = DisplayModes.FIXED
 decimalPlaces = 2
 
@@ -83,6 +82,9 @@ function press_key(key) {
         input_buffer += key
     } else if (key == Functions.DOT) {
         input_buffer += '.'
+    } else if (key == Functions.TAU) {
+        input_buffer = ''
+        stack.push(2*Math.PI)
     } else if (key == Functions.NEGATIVE) {
         if (input_buffer.length == 0) {
             x = stack.pop()
@@ -150,6 +152,24 @@ function press_key(key) {
                 break;
             case Functions.STACK_POP:
                 break;
+            case Functions.SIN:
+                result = Math.sin(x);
+                break;
+            case Functions.COS:
+                result = Math.cos(x);
+                break;
+            case Functions.TAN:
+                result = Math.tan(x);
+                break;
+            case Functions.ASIN:
+                result = Math.asin(x);
+                break;
+            case Functions.ACOS:
+                result = Math.acos(x);
+                break;
+            case Functions.ATAN:
+                result = Math.atan(x);
+                break;
         }
         if (key < Functions.ONE_INPUT_NO_OUTPUT)
             stack.push(result)
@@ -194,6 +214,10 @@ function press_key(key) {
         apply_function(1)
         appliedFunction = 1
         functionMode = 1
+    } else if (key == Functions.FUNCTION2) {
+        apply_function(2)
+        appliedFunction = 1
+        functionMode = 2
     } else if (key == Functions.NORMAL) {
 		apply_function(0)
 		appliedFunction = 0
@@ -374,8 +398,8 @@ Page({
             )
         }
 
-		stack.push(8e10)
-		stack.push(8e10)
+		//stack.push(8e10)
+		//stack.push(8e10)
 
 		update_display()
 

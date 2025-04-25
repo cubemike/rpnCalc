@@ -22,6 +22,12 @@ export default class Functions {
         'LN',
         'INV',
         'LOG2',
+        'SIN',
+        'COS',
+        'TAN',
+        'ASIN',
+        'ACOS',
+        'ATAN',
         'ONE_INPUT_NO_OUTPUT',
         'FIX',
         'SCI',
@@ -39,8 +45,10 @@ export default class Functions {
         'MOD',
         'LAST_TWO_INPUT_FUNCTION',
         'FUNCTION',
+        'FUNCTION2',
         'EE',
         'NORMAL',
+        'TAU',
     ]
 	static {
         let count = 0
